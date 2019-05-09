@@ -82,6 +82,8 @@ options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             //启用跨域访问配置
             app.UseCors("CorsSample");
 
+            app.UseMiddleware<IdentityMiddleware>();
+
             app.UseHttpsRedirection();
 
             //启用静态文件
