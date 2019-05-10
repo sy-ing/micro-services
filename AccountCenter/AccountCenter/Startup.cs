@@ -48,6 +48,9 @@ options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
         p => p.WithOrigins("*").AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin().AllowCredentials()));
 
 
+           
+
+
             string IsStartHF = Configuration.GetConnectionString("HangfireStart");
             //添加hangfire服务
             //if (IsStartHF == "true")

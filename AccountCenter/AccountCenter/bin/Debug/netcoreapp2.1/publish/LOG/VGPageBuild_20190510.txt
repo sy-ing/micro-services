@@ -1,0 +1,4 @@
+14:10:10::IdentityMiddleware::System.NullReferenceException: Object reference not set to an instance of an object.
+   at AccountCenter.AppCode.IdentityMiddleware.Invoke(HttpContext context) in D:\sying\micro-services\AccountCenter\AccountCenter\AppCode\IdentityMiddleware.cs:line 31
+14:10:10::IdentityMiddleware::System.NullReferenceException: Object reference not set to an instance of an object.
+   at AccountCenter.AppCode.IdentityMiddleware.Invoke(HttpContext context) in D:\sying\micro-services\AccountCenter\AccountCenter\AppCode\IdentityMiddleware.cs:line 31
