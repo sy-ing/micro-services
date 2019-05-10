@@ -22,6 +22,27 @@ namespace AccountCenter.Models.Data
 
             context.SaveChanges();
 
+
+            var admin = new Account
+            {
+                AccountName = "admin",
+                Code = Guid.NewGuid().ToString(),
+                Activity = true,
+                AddTime = DateTime.Now,
+                AvatarSrc = "",
+                Birthday = DateTime.Now,
+                Email = "",
+                Gender = "",
+                LastLoginIP = "",
+                NickName = "超级管理员",
+                Phone = "",
+                PassWord = "MEhI/iCoERQ/f9BWC8k8+c+qGS+Xdz02GwXn+CwIth8=",
+                MallCode = "",
+                SystemModule = "Manage"
+            };
+
+            context.Account.Add(admin);
+
         }
 
     }

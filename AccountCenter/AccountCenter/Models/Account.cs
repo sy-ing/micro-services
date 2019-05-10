@@ -102,6 +102,14 @@ namespace AccountCenter.Models
         [Display(Name = "LastLoginTime")]
         public DateTime LastLoginTime { get; set; }
 
+
+        /// <summary>
+        /// 登录过期时间
+        /// </summary>
+        [DataType(DataType.DateTime)]
+        [Display(Name = "InvalidTime")]
+        public DateTime InvalidTime { get; set; }
+
         /// <summary>
         /// 登录标记
         /// </summary>

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +35,26 @@ namespace AccountCenter.AppCode
         }
 
 
+        /// <summary>
+        /// 字符串进行PBKDF2加密
+        /// </summary>
+        /// <param name="inputStr"></param>
+        /// <returns></returns>
+
+        public static string StringToPBKDF2Hash(string inputStr)
+        {
+            byte[] salt = new byte[128 / 8];
+
+            string outString = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                                                     password: inputStr,//明文
+                                                     salt: salt,//盐
+                                                     prf: KeyDerivationPrf.HMACSHA1,//加密方式
+                                                     iterationCount: 10000,//迭代次数
+                                                     numBytesRequested: 256 / 8));
+
+            return outString;
+        }
+
         /// <summary>    
         /// DateTime时间格式转换为Unix时间戳格式    
         /// </summary>    
@@ -42,6 +64,22 @@ namespace AccountCenter.AppCode
         {
             DateTime startTime = TimeZoneInfo.ConvertTime(new DateTime(1970, 1, 1), TimeZoneInfo.Local);//等价的建议写法
             return (int)(time - startTime).TotalSeconds;
+        }
+
+
+        /// <summary>
+        /// 获取用户IP
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public static string GetUserIp(HttpContext context)
+        {
+            var ip = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            if (string.IsNullOrEmpty(ip))
+            {
+                ip = context.Connection.RemoteIpAddress.ToString();
+            }
+            return ip;
         }
     }
 }

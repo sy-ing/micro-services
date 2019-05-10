@@ -91,7 +91,23 @@ namespace AccountCenter.AppCode
                                 }
                                 else
                                 {
-                                    await _next.Invoke(context);
+                                    DbContextOptions<ContextString> options = new DbContextOptions<ContextString>();
+                                    ContextString dbContext = new ContextString(options);
+                                    var _User = dbContext.Account.Where(i => i.LoginSession == SecretId).FirstOrDefault();
+
+                                    if (_User == null)
+                                    {
+                                        //验证无法通过
+                                        qianMuResult.Code = "403";
+                                        qianMuResult.Msg = "无效的用户身份";
+                                        qianMuResult.Data = "";
+                                        await HandleExceptionAsync(context, qianMuResult);
+                                    }
+                                    else
+                                    {
+                                        await _next.Invoke(context);
+                                    }
+                                    
                                 }
                             }
 

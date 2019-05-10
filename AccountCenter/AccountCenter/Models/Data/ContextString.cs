@@ -23,8 +23,9 @@ namespace AccountCenter.Models.Data
         public DbSet<RolePermissions> RolePermissions { get; set; }
         public DbSet<Roles> Roles { get; set; }
         public DbSet<UserRoles> UserRoles { get; set; }
-      
-
+        public DbSet<SysLog> SysLog { get; set; }
+        public DbSet<PhoneRecord> PhoneRecord { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -35,9 +36,9 @@ namespace AccountCenter.Models.Data
             modelBuilder.Entity<RolePermissions>().ToTable("RolePermissions");
             modelBuilder.Entity<Roles>().ToTable("Roles");
             modelBuilder.Entity<UserRoles>().ToTable("UserRoles");
-          
 
-
+            modelBuilder.Entity<SysLog>().ToTable("SysLog");
+            modelBuilder.Entity<PhoneRecord>().ToTable("PhoneRecord");
 
 
 
