@@ -67,11 +67,11 @@ namespace AccountCenter.ViewModels
         [Display(Name = "Email")]
         public string Email { get; set; }
 
-        /// <summary>
-        /// 用户角色
-        /// </summary>
-        [Display(Name = "RoleCode")]
-        public string RoleCode { get; set; }
+        ///// <summary>
+        ///// 用户角色
+        ///// </summary>
+        //[Display(Name = "RoleCode")]
+        //public string RoleCode { get; set; }
 
         /// <summary>
         /// 备注

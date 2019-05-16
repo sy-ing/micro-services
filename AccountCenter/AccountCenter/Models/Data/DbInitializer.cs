@@ -15,7 +15,7 @@ namespace AccountCenter.Models.Data
 
 
             // Look for any files.
-            if (context.Menu.Any())
+            if (context.Account.Any())
             {
                 return;   // DB has been seeded
             }
@@ -36,13 +36,14 @@ namespace AccountCenter.Models.Data
                 LastLoginIP = "",
                 NickName = "超级管理员",
                 Phone = "",
-                PassWord = "MEhI/iCoERQ/f9BWC8k8+c+qGS+Xdz02GwXn+CwIth8=",
+                PassWord = "iUZHVuuOHrtoyI9wisHwUQbt78/nBA6YItQNst2sYi4=",
                 MallCode = "",
                 SystemModule = "Manage"
             };
 
             context.Account.Add(admin);
 
+            context.SaveChanges();
         }
 
     }

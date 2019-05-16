@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
@@ -66,6 +67,9 @@ options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            var redisConn = Configuration["WebConfig:Redis:Connection"];
+            RedisHelper redisHelper = new RedisHelper(redisConn);
+            Method._RedisHelper = redisHelper;
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -113,5 +117,8 @@ options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             Method._hostingEnvironment = env;
            // Method._context = context;
         }
+
+
+      
     }
 }

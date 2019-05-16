@@ -1,8 +1,0 @@
-10:20:52::IdentityMiddleware::System.InvalidOperationException: Nullable object must have a value.
-   at System.Nullable`1.get_Value()
-   at AccountCenter.AppCode.IdentityMiddleware.Invoke(HttpContext context) in D:\sying\micro-services\AccountCenter\AccountCenter\AppCode\IdentityMiddleware.cs:line 29
-10:21:17::IdentityMiddleware::System.InvalidOperationException: Nullable object must have a value.
-   at System.Nullable`1.get_Value()
-   at AccountCenter.AppCode.IdentityMiddleware.Invoke(HttpContext context) in D:\sying\micro-services\AccountCenter\AccountCenter\AppCode\IdentityMiddleware.cs:line 29
-14:44:36::IdentityMiddleware::System.NullReferenceException: Object reference not set to an instance of an object.
-   at AccountCenter.AppCode.IdentityMiddleware.Invoke(HttpContext context) in D:\sying\micro-services\AccountCenter\AccountCenter\AppCode\IdentityMiddleware.cs:line 33

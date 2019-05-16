@@ -19,6 +19,8 @@ namespace AccountCenter.AppCode
         //数据库字符串
         public static string ContextStr { get; set; }
 
+        public static RedisHelper _RedisHelper { get; set; }
+
 
         /// <summary>    
         /// Unix时间戳转为C#格式时间    
@@ -28,7 +30,7 @@ namespace AccountCenter.AppCode
         public static DateTime GetTime(string timeStamp)
         {
             DateTime dtStart = TimeZoneInfo.ConvertTime(new DateTime(1970, 1, 1), TimeZoneInfo.Local);
-
+           
             long lTime = long.Parse(timeStamp + "0000000");
             TimeSpan toNow = new TimeSpan(lTime);
             return dtStart.Add(toNow);

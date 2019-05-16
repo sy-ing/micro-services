@@ -28,69 +28,96 @@ namespace AccountCenter.AppCode
             QianMuResult qianMuResult = new QianMuResult();
             try
             {
-                
-                var Action = context.Request.Headers["Action"].FirstOrDefault();
-                if (!string.IsNullOrEmpty(Action))
+               
+                if (context.Request.Method  == "POST")
                 {
-                    if (Action.ToLower() != "login")
-                    {
 
-                        var SecretId = context.Request.Headers["SecretId"].FirstOrDefault();
-                        var SecretKey = context.Request.Headers["SecretKey"].FirstOrDefault();
-                        var Timestamp = context.Request.Headers["Timestamp"].FirstOrDefault();
+                   var Action = context.Request.Headers["Action"].FirstOrDefault();
+                   if (!string.IsNullOrEmpty(Action))
+                   {
+                         
+                     
+                     if (Action.ToLower() != "login")
+                     {
+                           
+                          
+                                                    var SecretId = context.Request.Headers["SecretId"].FirstOrDefault();
+                          var SecretKey = context.Request.Headers["SecretKey"].FirstOrDefault();
+                          var Timestamp = context.Request.Headers["Timestamp"].FirstOrDefault();
 
-                        if (string.IsNullOrEmpty(Timestamp) || string.IsNullOrEmpty(SecretId) || string.IsNullOrEmpty(SecretKey))
-                        {
-                            //验证无法通过
-                            qianMuResult.Code = "403";
-                            qianMuResult.Msg = "验证参数不全";
-                            qianMuResult.Data = "";
-                            await HandleExceptionAsync(context, qianMuResult);
-                        }
-                        else
-                        {
-                            var datetime = Method.GetTime(Timestamp);
-                            if (DateTime.Now.AddMinutes(-1) > datetime)
-                            {
-                                //验证无法通过
-                                qianMuResult.Code = "403";
-                                qianMuResult.Msg = "请求超时";
-                                qianMuResult.Data = "";
-                                await HandleExceptionAsync(context, qianMuResult);
-                            }
-                            else
-                            {
-                                var Parameter = string.Empty;
-                                Stream stream = context.Request.Body;
+                          if (string.IsNullOrEmpty(Timestamp) || string.IsNullOrEmpty(SecretId) || string.IsNullOrEmpty(SecretKey))
+                          {
+                              //验证无法通过
+                              qianMuResult.Code = "403";
+                              qianMuResult.Msg = "验证参数不全";
+                              qianMuResult.Data = "";
+                              await HandleExceptionAsync(context, qianMuResult);
+                          }
+                          else
+                          {
+                              var datetime = Method.GetTime(Timestamp);
 
-                                if (context.Request.ContentLength != null)
-                                {
+                              //东八区时间
+                              datetime=  datetime.AddHours(8);
+
+                              if (DateTime.Now.AddMinutes(-10) > datetime)
+                              {
+                                  //验证无法通过
+                                  qianMuResult.Code = "403";
+                                  qianMuResult.Msg = "请求超时";
+                                  qianMuResult.Data = "";
+                                  await HandleExceptionAsync(context, qianMuResult);
+                              }
+                              else
+                              {
+                                  var Parameter = string.Empty;
+                                    // 使request.body可以读取多次
+                                    //context.Request.EnableBuffering();
+                                    Stream stream = context.Request.Body;
+
                                     byte[] buffer = new byte[context.Request.ContentLength.Value];
-                                    stream.Read(buffer, 0, buffer.Length);
+                                    int readCount = 0; // 已经成功读取的字节的个数
+                                    while (readCount < context.Request.ContentLength.Value)
+                                    {
+                                        readCount += stream.Read(buffer, readCount, (int)context.Request.ContentLength.Value - readCount);
+                                    }
+
                                     Parameter = Encoding.UTF8.GetString(buffer);
-                                }
-                                StringBuilder stringBuilder = new StringBuilder();
-                                stringBuilder.Append("Action=");
-                                stringBuilder.Append(Action);
-                                stringBuilder.Append("Parameter=");
-                                stringBuilder.Append(Parameter);
-                                stringBuilder.Append("SecretId=");
-                                stringBuilder.Append(SecretId);
-                                stringBuilder.Append("Timestamp=");
-                                stringBuilder.Append(Timestamp);
 
-                                var _key = EncryptHelper.Sha1(Base64.EncodeBase64(stringBuilder.ToString()));
 
-                                if (_key != SecretKey)
-                                {
-                                    //验证无法通过
-                                    qianMuResult.Code = "403";
-                                    qianMuResult.Msg = "密钥验证失败";
-                                    qianMuResult.Data = "";
-                                    await HandleExceptionAsync(context, qianMuResult);
-                                }
-                                else
-                                {
+
+                              
+                                  StringBuilder stringBuilder = new StringBuilder();
+                                  stringBuilder.Append("Action=");
+                                  stringBuilder.Append(Action);
+                                  stringBuilder.Append("Parameter=");
+                                  stringBuilder.Append(Parameter);
+                                  stringBuilder.Append("SecretId=");
+                                  stringBuilder.Append(SecretId);
+                                  stringBuilder.Append("Timestamp=");
+                                  stringBuilder.Append(Timestamp);
+
+
+                                    
+                                    //var aaa = stringBuilder.ToString();
+                                    //var bbb = Base64.EncodeBase64(stringBuilder.ToString());
+                                    //QMLog qMLog = new QMLog();
+                                    //qMLog.WriteLogToFile("aaa", aaa);
+                                    //qMLog.WriteLogToFile("bbb", bbb);
+                                    var _key = EncryptHelper.Sha1(Base64.EncodeBase64(stringBuilder.ToString()));
+
+                                  if (_key.ToLower() != SecretKey.ToLower())
+                                  {
+                                      //验证无法通过
+                                      qianMuResult.Code = "403";
+                                      qianMuResult.Msg = "密钥验证失败";
+                                      qianMuResult.Data = "";
+                                      await HandleExceptionAsync(context, qianMuResult);
+                                  }
+                                  else
+                                  {
+                                       // await this._next(context);
+                                        
                                     DbContextOptions<ContextString> options = new DbContextOptions<ContextString>();
                                     ContextString dbContext = new ContextString(options);
                                     var _User = dbContext.Account.Where(i => i.LoginSession == SecretId).FirstOrDefault();
@@ -105,31 +132,46 @@ namespace AccountCenter.AppCode
                                     }
                                     else
                                     {
-                                        await _next.Invoke(context);
+                                         
+                                            Method._RedisHelper.SetValue(_key.ToLower(), Parameter);
+                                            //  await _next.Invoke(context);
+                                            await this._next(context);
                                     }
-                                    
+                                      
+                                    }
                                 }
-                            }
 
 
                         }
 
+                         
 
-
+                                    }
+                     else
+                     {
+                         //await _next.Invoke(context);
+                         await this._next(context);
+                     }
+                   
                     }
                     else
-                    {
-                        await _next.Invoke(context);
+                 {
+                     //验证无法通过
+                     qianMuResult.Code = "403";
+                     qianMuResult.Msg = "未能检测到Action";
+                     qianMuResult.Data = "";
+                     await HandleExceptionAsync(context, qianMuResult);
+                 }
+                 
                     }
-                }
-                else
+                    else
                 {
-                    //验证无法通过
-                    qianMuResult.Code = "403";
-                    qianMuResult.Msg = "未能检测到Action";
-                    qianMuResult.Data = "";
-                    await HandleExceptionAsync(context, qianMuResult);
+                  //  await _next.Invoke(context);
+                      await this._next(context);
                 }
+                
+
+          
             
 
 

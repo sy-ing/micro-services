@@ -5,3 +5,185 @@
 <h3>@ViewData["Message"]</h3>
 
 <p>Use this area to provide additional information.</p>
+<input type ="button" value="登录" onclick="Login()"/>
+<table>
+
+    <tr>
+        <td>
+            Action:
+        </td>
+
+        <td>
+            <input id="action" type="text" value="Register"/>
+        </td>
+
+    </tr>
+    <tr>
+        <td>
+            SecretId:
+        </td>
+        <td>
+            <input id="secretid" type="text" />
+        </td>
+
+    </tr>
+    <tr>
+        <td>
+            Parameter:
+        </td>
+        <td>
+            <textarea id="parameter"></textarea>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <input type="button" value="计算" onclick="CreateToken()" />
+        </td>
+        <td>
+            <input type="button" value="请求" onclick="Register()" />
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <input type="text" placeholder="Timestamp" id="timestamp" />
+        </td>
+        <td>
+            <input type="text" placeholder="SecretKey" id="secretkey" />
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+           原始字符串 <textarea id="param"></textarea>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+         Base64字符串   <textarea id="base64str"></textarea>
+        </td>
+    </tr>
+    
+</table>
+
+<script src="~/js/jquery-1.11.1.min.js"></script>
+<script src="~/js/base64.js"></script>
+<script src="~/js/sha1.js"></script>
+<script>
+
+    function CreateToken() {
+        var timestamp  =Math.round(new Date().getTime()/1000) 
+      //  var timestamp = parseInt(time / 1000);
+        $("#timestamp").val(timestamp);
+        var Action = $("#action").val();
+        var Parameter = $("#parameter").val();
+        var SecretId = $("#secretid").val();
+
+
+        var stringBuilder = "Action=";
+        stringBuilder += Action;
+        stringBuilder += "Parameter=";
+        stringBuilder += Parameter;
+        stringBuilder += "SecretId=";
+        stringBuilder += SecretId;
+        stringBuilder += "Timestamp=";
+        stringBuilder += timestamp;
+        var _Base64 = new Base64();
+        $("#param").val(stringBuilder);
+        var base64str = _Base64.encode(stringBuilder);
+         $("#base64str").val(base64str);
+        var _key = hex_sha1(base64str);
+
+        $("#secretkey").val(_key);
+       
+    }
+
+    function Register() {
+        var jsondata = $("#parameter").val();
+        var SecretId = $("#secretid").val();
+        var timestamp = $("#timestamp").val();
+         var SecretKey = $("#secretkey").val();
+          var url = "/Account/Register";
+        var _r = 500;
+        $.ajax({
+            url: url,
+            type: "post",
+            async: false,
+            data: jsondata,
+            dataType: "json",
+            contentType: "application/json",
+            jsonpCallback: 'jsonCallback',
+             beforeSend: function (XMLHttpRequest) {
+                    //HttpUtility.UrlEncode
+                    
+                 XMLHttpRequest.setRequestHeader("Action", "Register");
+                 XMLHttpRequest.setRequestHeader("SecretId", SecretId);
+                 XMLHttpRequest.setRequestHeader("SecretKey",SecretKey);
+                 XMLHttpRequest.setRequestHeader("Timestamp",timestamp);
+               },
+            success: function (data) {
+                _r = data.code;
+                if (data.code == 200) {
+                    $("#secretid").val(data.data);
+                }
+                else {
+
+                    alert(data.msg);
+                }
+            },
+            error: function (e) {
+                alert("请求出错！");
+                alert(JSON.stringify(e));
+
+            }
+        });
+
+        return _r;
+    }
+
+    function Login() {
+        var pwd = "qianmu2011";
+        var key  = hex_sha1(pwd);
+          var jsondata = new Input_LoginViewModel("admin", key, "on");
+
+        var url = "/User/Login";
+        var _r = 500;
+        $.ajax({
+            url: url,
+            type: "post",
+            async: false,
+            data: JSON.stringify(jsondata),
+            dataType: "json",
+            contentType: "application/json",
+            jsonpCallback: 'jsonCallback',
+             beforeSend: function (XMLHttpRequest) {
+                    //HttpUtility.UrlEncode
+                    
+                    XMLHttpRequest.setRequestHeader("Action", "login");
+               },
+            success: function (data) {
+                _r = data.code;
+                if (data.code == 200) {
+                    $("#secretid").val(data.data);
+                }
+                else {
+
+                    alert(data.msg);
+                }
+            },
+            error: function (e) {
+                alert("请求出错！");
+                alert(JSON.stringify(e));
+
+            }
+        });
+
+        return _r;
+    }
+
+  
+    
+      function Input_LoginViewModel(AccountName,Password,RememberMe) {
+          this.AccountName = AccountName;
+          this.Password = Password;
+          this.RememberMe = RememberMe;
+    }
+</script>
